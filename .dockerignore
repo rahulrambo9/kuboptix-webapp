@@ -1,0 +1,16 @@
+# Ignore entire directories
+node_modules/
+.git/
+target/
+dist/
+backend/
+.next/
+k8s/
+
+# Ignore files
+.next
+.git
+.env.local
+npm-debug.log
+Dockerfile
+README.md
