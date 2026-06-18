@@ -1,14 +1,47 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Layers, Activity, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useNamespace } from "../components/NamespaceContext";
+
+interface Deployment {
+  name: string;
+  ns: string;
+  ready: number;
+  total: number;
+  strategy: string;
+  age: string;
+  status: string;
+}
 
 export default function DeploymentsPage() {
-  const deployments = [
-    { name: "frontend", ns: "default", ready: 2, total: 3, strategy: "RollingUpdate", age: "78d", status: "scaling" },
-    { name: "backend-api", ns: "production", ready: 1, total: 2, strategy: "RollingUpdate", age: "97d", status: "scaling" },
-    { name: "auth-service", ns: "default", ready: 1, total: 2, strategy: "RollingUpdate", age: "79d", status: "warning" },
-    { name: "payment-service", ns: "staging", ready: 3, total: 3, strategy: "RollingUpdate", age: "84d", status: "healthy" },
-    { name: "notification-service", ns: "staging", ready: 2, total: 3, strategy: "RollingUpdate", age: "102d", status: "scaling" },
-    { name: "user-service", ns: "default", ready: 4, total: 4, strategy: "RollingUpdate", age: "112d", status: "healthy" },
-  ];
+  const { selectedNamespace } = useNamespace();
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDeployments = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/deployments?namespace=${selectedNamespace}`);
+        if (!response.ok) throw new Error("Failed to reach Jarvis Backend");
+        
+        const data = await response.json();
+        setDeployments(data);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    setLoading(true);
+    fetchDeployments();
+    
+    const interval = setInterval(fetchDeployments, 10000);
+    return () => clearInterval(interval);
+  }, [selectedNamespace]);
 
   return (
     <div className="space-y-6">
@@ -18,9 +51,31 @@ export default function DeploymentsPage() {
           <Layers className="w-8 h-8" /> DEPLOYMENTS
         </h1>
         <p className="text-xs text-slate-500 font-mono tracking-widest uppercase mt-1 ml-11">
-          {deployments.length} ACTIVE DEPLOYMENTS
+          {loading && deployments.length === 0 ? "RETRIEVING..." : `${deployments.length} ACTIVE DEPLOYMENTS`}
         </p>
       </div>
+
+      {/* ERROR STATE */}
+      {error && (
+        <div className="flex items-center gap-3 p-4 bg-red-900/20 border border-red-500/50 rounded text-red-400 font-mono text-sm">
+          <AlertCircle size={18} />
+          SYSTEM ERROR: {error} (Check CORS/Backend)
+        </div>
+      )}
+
+      {/* LOADING STATE */}
+      {loading && deployments.length === 0 && (
+        <div className="text-[#00f0ff] font-mono animate-pulse">
+          INITIALIZING TELEMETRY LINK FOR DEPLOYMENTS...
+        </div>
+      )}
+
+      {/* EMPTY STATE */}
+      {!loading && deployments.length === 0 && !error && (
+        <div className="p-8 border border-dashed border-slate-800 rounded bg-[#0a0f1c]/30 text-center text-slate-500 font-mono">
+          NO DEPLOYMENTS FOUND IN NAMESPACE: {selectedNamespace.toUpperCase()}
+        </div>
+      )}
 
       {/* DEPLOYMENTS GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

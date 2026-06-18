@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Box, RefreshCw, Terminal, AlertCircle } from "lucide-react";
+import { useNamespace } from "../components/NamespaceContext";
 
 interface Pod {
   name: string;
@@ -13,21 +14,20 @@ interface Pod {
 }
 
 export default function PodsPage() {
-  // 1. Initialize state with an empty array
-
-  const [pods, setPods] = useState<Pod[]>([]); // Tells TS this is an array of Pods
+  const { selectedNamespace } = useNamespace();
+  const [pods, setPods] = useState<Pod[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 2. Fetch data from Flask on component mount
   useEffect(() => {
     const fetchPods = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/pods');
+        const response = await fetch(`http://localhost:8000/api/pods?namespace=${selectedNamespace}`);
         if (!response.ok) throw new Error("Failed to reach Jarvis Backend");
         
         const data = await response.json();
         setPods(data);
+        setError(null);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -35,12 +35,12 @@ export default function PodsPage() {
       }
     };
 
+    setLoading(true);
     fetchPods();
     
-    // Optional: Polling every 10 seconds for real-time feel
     const interval = setInterval(fetchPods, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedNamespace]);
 
   return (
     <div className="space-y-6">

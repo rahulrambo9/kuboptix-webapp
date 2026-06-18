@@ -5,6 +5,7 @@ import { Activity, Box, Layers, Server, Share2 } from "lucide-react";
 // Ensure these imports match your filenames exactly!
 import SystemStatus from "./components/SystemStatus"; 
 import NamespaceSelector from "./components/NamespaceSelector";
+import { NamespaceProvider } from "./components/NamespaceContext";
 
 export default function DashboardLayout({
   children,
@@ -12,7 +13,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-[#020617] font-sans text-white">
+    <NamespaceProvider>
+      <div className="flex min-h-screen bg-[#020617] font-sans text-white">
       
       {/* =======================
           SIDEBAR NAVIGATION
@@ -95,6 +97,7 @@ export default function DashboardLayout({
       </div>
 
     </div>
+    </NamespaceProvider>
   );
 }
 

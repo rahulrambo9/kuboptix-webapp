@@ -22,7 +22,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-      router.push("/dashboard");
+      router.push("/connect");
       return;
     }
 

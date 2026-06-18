@@ -2,19 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { Filter } from "lucide-react";
+import { useNamespace } from "./NamespaceContext";
 
 // ✅ THE WORD "default" IS REQUIRED HERE
 export default function NamespaceSelector() {
   const [namespaces, setNamespaces] = useState<string[]>([]);
-  const [selected, setSelected] = useState("default");
+  const { selectedNamespace, setSelectedNamespace } = useNamespace();
 
   useEffect(() => {
     fetch("http://localhost:8000/api/namespaces")
       .then((res) => res.json())
       .then((data) => {
-        setNamespaces(data);
-        if (data.includes("default")) setSelected("default");
-        else if (data.length > 0) setSelected(data[0]);
+        const nsList = ["all", ...data.filter((ns: string) => ns !== "all")];
+        setNamespaces(nsList);
+        
+        // If context is "default" but it doesn't exist, select the first namespace
+        if (selectedNamespace === "default" && !data.includes("default")) {
+          if (data.length > 0) {
+            setSelectedNamespace(data[0]);
+          } else {
+            setSelectedNamespace("all");
+          }
+        }
       })
       .catch((err) => console.error("Failed to load namespaces", err));
   }, []);
@@ -28,8 +37,8 @@ export default function NamespaceSelector() {
 
       <div className="relative group">
         <select 
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
+          value={selectedNamespace}
+          onChange={(e) => setSelectedNamespace(e.target.value)}
           className="appearance-none bg-[#0a0f1c] border border-slate-700 text-[#00f0ff] text-xs font-mono font-bold py-1 px-3 pr-8 rounded focus:outline-none focus:border-[#00f0ff] focus:shadow-[0_0_10px_rgba(0,240,255,0.2)] transition-all cursor-pointer uppercase min-w-[120px]"
         >
           {namespaces.map((ns) => (
