@@ -215,7 +215,7 @@ function DropdownPanel({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute top-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-[580px] animate-[ddFadeIn_0.18s_ease-out]">
+    <div className="absolute top-[calc(100%+10px)] left-0 w-[580px] animate-[ddFadeIn_0.18s_ease-out]">
       <div className="rounded-2xl border border-slate-700/80 bg-[#070d1a] shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_0_1px_rgba(0,240,255,0.08)]">
 
         {/* Cyan top accent */}
@@ -277,8 +277,8 @@ function DropdownPanel({
 
       <style>{`
         @keyframes ddFadeIn {
-          from { opacity: 0; transform: translate(-50%, -8px) scale(0.98); }
-          to   { opacity: 1; transform: translate(-50%, 0)   scale(1);    }
+          from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0)    scale(1);    }
         }
       `}</style>
     </div>

@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   Terminal, Cloud, Server, Database, HardDrive,
-  Code, Feather, Box, Globe, Cpu, Layers,
+  Wind, Coffee, Braces, Code2, FileCode, Gem,
   Bot, ShieldCheck, LayoutDashboard, ChevronRight,
-  Zap, Mail,
+  Zap, Mail, Sparkles, CheckCircle
 } from "lucide-react";
 
 import Navbar from "./components/Navbar";
 import InteractiveSphere from "./components/InteractiveSphere";
+import VisualProofWidget from "./components/VisualProofWidget";
 
 export default function HomePage() {
   const [activeIntegration, setActiveIntegration] = useState("nodejs");
@@ -26,8 +27,7 @@ export default function HomePage() {
     <main className="w-full relative flex flex-col font-sans text-white bg-transparent">
 
       {/* GLOBAL BACKGROUND GRID */}
-      <div className="absolute inset-0 h-full bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none z-0" />
-
+      <div className="absolute inset-0 h-full bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none z-0" />
 
       {/* STICKY NAVBAR */}
       <Navbar />
@@ -35,146 +35,193 @@ export default function HomePage() {
       {/* =========================================
           SECTION 1: HERO
       ========================================= */}
-      <section className="min-h-screen flex flex-col relative z-10 pt-20 max-w-7xl mx-auto px-8 justify-center">
+      <section className="min-h-screen w-full flex items-center relative z-10 pt-28 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full max-w-7xl mx-auto px-8">
 
-        {/* Centered Top Title & Badge */}
-        <div className="flex flex-col items-center text-center space-y-4 mb-8">
-          {/* Badge */}
-          <div className="flex items-center gap-2 px-5 py-2 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/5 text-[#00f0ff] text-sm font-sans font-medium tracking-widest shadow-[0_0_12px_rgba(0,240,255,0.15)]">
-            <span className="w-2 h-2 rounded-full bg-[#00f0ff] animate-pulse" />
-            AUTONOMOUS KUBERNETES PLATFORM · v2.0 ENTERPRISE
-          </div>
+          {/* Left Column: Heading + Subtitle + CTAs + Visual Proof Widget */}
+          <div className="flex flex-col items-start text-left space-y-8">
 
-          <h1 className="font-orbitron text-4xl md:text-6xl font-bold tracking-tight text-white drop-shadow-[0_0_24px_rgba(0,240,255,0.4)]">
-            WELCOME TO <span className="text-[#00f0ff] drop-shadow-[0_0_30px_rgba(0,240,255,0.65)]">KUBOPTIX</span>
-          </h1>
-        </div>
+            {/* Futuristic typography with exact Copywriting Headline */}
+            <h1 className="leading-[1.1] tracking-tight">
+              <span className="block font-sans font-extrabold text-white"
+                style={{ fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)" }}>
+                Beautiful Kubernetes Monitoring.
+              </span>
+              <span
+                className="block font-orbitron font-bold text-[#00f2fe] drop-shadow-[0_0_30px_rgba(0,242,254,0.45)]"
+                style={{ fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)" }}>
+                Effortless AI Remediation.
+              </span>
+            </h1>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full py-6">
-          
-          {/* Left Description Column */}
-          <div className="lg:col-span-6 flex flex-col items-start text-left space-y-6">
-            <p className="text-slate-300 text-lg md:text-xl leading-relaxed border-l-2 border-[#00f0ff] pl-6 bg-black/30 p-5 rounded-r-lg backdrop-blur-sm font-sans">
-              Experience the core interaction concept of autonomous operations. 
-              Our interactive particle sphere responds dynamically to your hover state, representing self-healing node clusters, automated pod topology, and real-time telemetry scaling.
+            {/* Subheadline matching copy structure */}
+            <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-[550px] font-sans">
+              Give your engineering and security teams absolute clarity over cluster health. Instantly visualize every resource, catch configuration risks automatically, and use built-in AI scanning to fix failing pods and security threats with one click.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-              <Link
-                href="/login"
-                className="flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-[#00f0ff] bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 text-[#00f0ff] rounded-lg font-orbitron text-sm tracking-widest transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] hover:shadow-[0_0_28px_rgba(0,240,255,0.5)] w-full sm:w-auto"
-              >
-                <Zap size={16} />
-                LAUNCH DASHBOARD
-              </Link>
+            {/* CTA Button Hierarchy resolving decision paralysis */}
+            <div className="flex flex-row items-center gap-4 flex-wrap">
               <a
                 href="#waitlist"
-                className="flex items-center justify-center gap-2 px-8 py-3.5 border border-slate-600 bg-slate-900/50 hover:border-slate-400 text-slate-200 hover:text-white rounded-lg font-sans text-sm font-semibold tracking-wide transition-all w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-[#00f2fe] hover:bg-[#00f2fe]/95 text-[#020617] font-bold rounded-lg font-orbitron text-xs tracking-[0.15em] transition-all hover:scale-[1.03] active:scale-[0.98] shadow-[0_0_24px_rgba(0,242,254,0.4)] hover:shadow-[0_0_36px_rgba(0,242,254,0.6)] uppercase"
               >
-                Request Early Access
-                <ChevronRight size={16} />
+                Book a Demo
               </a>
+              <Link
+                href="/login"
+                className="flex items-center justify-center gap-2 px-8 py-4 border-2 border-slate-700 hover:border-[#00f2fe] bg-transparent text-slate-300 hover:text-white rounded-lg font-orbitron text-xs tracking-[0.15em] transition-all hover:bg-[#00f2fe]/5 uppercase"
+              >
+                <Zap size={13} className="text-[#00f2fe]" />
+                Launch Dashboard
+              </Link>
             </div>
+
+            {/* Visual Proof Before & After Widget */}
+            <div className="w-full pt-4 border-t border-slate-900/60">
+              <p className="text-[10px] font-mono text-slate-500 tracking-[0.25em] uppercase mb-3 flex items-center gap-1.5">
+                <Sparkles size={11} className="text-[#00f2fe]" /> See it in action: AI remediation demo
+              </p>
+              <VisualProofWidget />
+            </div>
+
           </div>
 
-          {/* Right Floating Sphere Column */}
-          <div className="lg:col-span-6 flex justify-center items-center">
+          {/* Right Column: Interactive 3D Sphere */}
+          <div className="flex flex-col justify-center items-center relative">
             <InteractiveSphere />
           </div>
-          
-        </div>
 
-        <div className="flex justify-center pb-8">
-          <div className="animate-bounce text-slate-500 text-sm tracking-widest font-sans">
-            Scroll to explore ↓
+        </div>
+      </section>
+
+      {/* =========================================
+          SECTION 1.5: FEATURES SECTION
+      ========================================= */}
+      <section className="py-24 w-full relative z-10 border-y border-slate-900 bg-[#040812]/50 backdrop-blur-sm">
+        {/* Subtle background glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-[#00f2fe]/2 blur-[120px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-8 w-full">
+          {/* Header */}
+          <div className="text-center md:text-left mb-16 max-w-3xl">
+            <p className="text-xs font-mono tracking-[0.3em] text-[#00f2fe] uppercase mb-3">AUTONOMOUS ADVANTAGE</p>
+            <h2 className="font-orbitron text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+              PRODUCT <span className="text-[#00f2fe] drop-shadow-[0_0_15px_rgba(0,242,254,0.3)]">CAPABILITIES</span>
+            </h2>
+            <p className="text-slate-400 text-sm md:text-base leading-relaxed">
+              Designed to eliminate developer toil and solve alert fatigue. Kuboptix handles security incidents, 
+              deployment drift, and resource inefficiencies automatically so you can focus on shipping code.
+            </p>
+          </div>
+
+          {/* 3 Expanded Copywriting Hooks Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <FeatureCard 
+              icon={<Bot className="text-[#00f2fe]" size={24} />}
+              title="From Alert to Repaired in a Single Click"
+              description="No more digging through endless log lines. When a pod fails or an active security threat is detected, our AI scans the root cause and provides a validated, one-click remediation script."
+              detailText="Drastically cuts MTTR and eliminates manual log parsing."
+            />
+            <FeatureCard 
+              icon={<LayoutDashboard className="text-emerald-400" size={24} />}
+              title="Security & Operations, Perfectly Visualized"
+              description="Give your customers a stunning, intuitive dashboard that translates chaotic Kubernetes YAML files into an elegant, interactive map of their actual cloud health."
+              detailText="Instantly visualizes complex namespace dependencies."
+            />
+            <FeatureCard 
+              icon={<ShieldCheck className="text-purple-400" size={24} />}
+              title="Auto-Remediation You Can Trust"
+              description="Set your guardrails. Let Kuboptix fix known configuration drifts and minor runtime incidents autonomously, or prompt your team for quick approval before executing critical updates."
+              detailText="Balance automated scaling with safe DevOps guardrails."
+            />
           </div>
         </div>
       </section>
 
-
       {/* =========================================
           SECTION 2: CLOUD PROVIDERS
       ========================================= */}
-      <section className="min-h-screen flex flex-col items-center justify-center relative z-10 p-10">
+      <section className="py-24 flex flex-col items-center justify-center relative z-10 px-8">
         <div className="text-center mb-4">
           <p className="text-xs font-mono tracking-[0.3em] text-slate-500 uppercase mb-3">MULTI-CLOUD COMPATIBILITY</p>
-          <h2 className="font-orbitron text-3xl md:text-5xl text-white tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">
-            CHOOSE YOUR <span className="text-[#00f0ff]">PROVIDER</span>
+          <h2 className="font-orbitron text-3xl md:text-5xl text-white tracking-tighter drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] uppercase">
+            Choose Your <span className="text-[#00f2fe]">Provider</span>
           </h2>
         </div>
         <p className="text-slate-500 text-sm font-mono tracking-wider mb-16 text-center">
           Native integration with all major managed Kubernetes services.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl">
           <Link href="/login" className="w-full">
-            <ProviderCard title="AWS EKS" color="#FF9900" icon={<Cloud size={40} />} desc="Elastic Kubernetes Service" />
+            <ProviderCard title="AWS EKS" color="#FF9900" icon={<Cloud size={36} />} desc="Elastic Kubernetes Service" />
           </Link>
           <Link href="/login" className="w-full">
-            <ProviderCard title="AZURE AKS" color="#007FFF" icon={<Database size={40} />} desc="Azure Kubernetes Service" />
+            <ProviderCard title="AZURE AKS" color="#007FFF" icon={<Database size={36} />} desc="Azure Kubernetes Service" />
           </Link>
           <Link href="/login" className="w-full">
-            <ProviderCard title="GCP GKE" color="#4285F4" icon={<Server size={40} />} desc="Google Kubernetes Engine" />
+            <ProviderCard title="GCP GKE" color="#4285F4" icon={<Server size={36} />} desc="Google Kubernetes Engine" />
           </Link>
           <Link href="/login" className="w-full">
-            <ProviderCard title="ON-PREM" color="#10b981" icon={<HardDrive size={40} />} desc="Bare Metal / Private Cloud" />
+            <ProviderCard title="ON-PREM" color="#10b981" icon={<HardDrive size={36} />} desc="Bare Metal / Private Cloud" />
           </Link>
         </div>
       </section>
 
-
       {/* =========================================
           SECTION 3: INTEGRATIONS
       ========================================= */}
-      <section className="min-h-screen flex flex-col items-center justify-center relative z-10 px-6 py-20">
-        <div className="w-full max-w-6xl">
+      <section className="py-24 flex flex-col items-center justify-center relative z-10 px-8 bg-[#040812]/20 border-t border-slate-900">
+        <div className="w-full max-w-7xl">
           {/* Header */}
           <p className="text-xs font-mono tracking-[0.3em] text-slate-500 uppercase mb-3">TELEMETRY & OBSERVABILITY</p>
-          <h2 className="font-orbitron text-4xl md:text-6xl font-bold mb-6 tracking-tighter drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-            SYSTEM <span className="text-[#00f0ff]">INTEGRATIONS</span>
+          <h2 className="font-orbitron text-3xl md:text-5xl font-bold mb-6 tracking-tighter drop-shadow-[0_0_15px_rgba(0,242,254,0.25)]">
+            SYSTEM <span className="text-[#00f2fe]">INTEGRATIONS</span>
           </h2>
-          <p className="text-base md:text-lg mb-10 max-w-3xl text-slate-400 border-l-2 border-[#00f0ff]/50 pl-4">
+          <p className="text-base text-slate-400 border-l-2 border-[#00f2fe]/50 pl-4 max-w-3xl leading-relaxed">
             Initialize connection with 780+ supported modules.
             Enable real-time telemetry for application logs and infrastructure metrics.
           </p>
 
-          <button className="px-8 py-3 border border-[#00f0ff] bg-[#00f0ff]/5 hover:bg-[#00f0ff]/10 text-[#00f0ff] rounded font-orbitron tracking-widest text-sm transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)] hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] mb-20">
+          <button className="mt-8 px-8 py-3.5 border border-[#00f2fe] bg-[#00f2fe]/5 hover:bg-[#00f2fe]/10 text-[#00f2fe] rounded font-orbitron tracking-widest text-xs transition-all shadow-[0_0_10px_rgba(0,242,254,0.1)] hover:shadow-[0_0_20px_rgba(0,242,254,0.25)] mb-16">
             VIEW ALL MODULES
           </button>
 
           {/* Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-12">
             {integrationsData.map((item) => (
               <button
                 key={item.id}
                 onMouseEnter={() => setActiveIntegration(item.id)}
-                className={`flex flex-col items-center justify-center h-32 rounded-lg border backdrop-blur-md transition-all duration-300
+                className={`flex flex-col items-center justify-center h-28 rounded-lg border backdrop-blur-md transition-all duration-300
                   ${activeIntegration === item.id
-                    ? "bg-[#00f0ff]/20 border-[#00f0ff] text-white scale-110 shadow-[0_0_20px_rgba(0,240,255,0.3)] z-10"
-                    : "bg-[#0a0f1c]/40 border-slate-700 text-slate-400 hover:border-[#00f0ff]/50 hover:text-white"
+                    ? "bg-[#00f2fe]/15 border-[#00f2fe] text-white scale-105 shadow-[0_0_15px_rgba(0,242,254,0.2)] z-10"
+                    : "bg-[#070d1a]/40 border-slate-800 text-slate-400 hover:border-[#00f2fe]/50 hover:text-white"
                   }`}
               >
-                <div className={`mb-2 transition-colors ${activeIntegration === item.id ? "text-[#00f0ff]" : ""}`}>
+                <div
+                  className="mb-2 transition-colors"
+                  style={{ color: activeIntegration === item.id ? item.color : undefined }}
+                >
                   {item.icon}
                 </div>
-                <span className="text-xs font-orbitron tracking-widest">{item.label}</span>
+                <span className="text-[10px] font-orbitron tracking-widest font-bold">{item.label}</span>
               </button>
             ))}
           </div>
 
           {/* Dynamic Description Box */}
-          <div className="flex flex-col md:flex-row items-start gap-8 min-h-[150px] p-8 rounded-xl border border-[#00f0ff]/20 bg-[#0a0f1c]/60 backdrop-blur-md shadow-[0_0_30px_-10px_rgba(0,240,255,0.1)]">
-            <div className="p-4 bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-[#00f0ff] rounded-lg shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+          <div className="flex flex-col md:flex-row items-start gap-6 p-6 rounded-xl border border-[#00f2fe]/20 bg-[#070d1a]/80 backdrop-blur-md shadow-[0_0_30px_-10px_rgba(0,242,254,0.1)]">
+            <div className="p-4 bg-[#00f2fe]/10 border border-[#00f2fe]/30 text-[#00f2fe] rounded-lg shadow-[0_0_15px_rgba(0,242,254,0.15)] shrink-0">
               {integrationsData.find((i) => i.id === activeIntegration)?.icon}
             </div>
             <div>
-              <h3 className="font-orbitron text-2xl font-bold mb-2 text-white tracking-tight">
+              <h3 className="font-orbitron text-xl font-bold mb-1 text-white tracking-tight">
                 {integrationsData.find((i) => i.id === activeIntegration)?.label}{" "}
-                <span className="text-[#00f0ff] text-sm align-middle tracking-widest ml-2">module_active</span>
+                <span className="text-[#00f2fe] text-xs align-middle tracking-widest ml-2">module_active</span>
               </h3>
-              <p className="text-base text-slate-300 max-w-4xl leading-relaxed">
+              <p className="text-sm text-slate-300 max-w-4xl leading-relaxed">
                 Analyzing request latency and throughput. Optimize your{" "}
-                <span className="text-[#00f0ff] font-bold">
+                <span className="text-[#00f2fe] font-bold">
                   {integrationsData.find((i) => i.id === activeIntegration)?.label}
                 </span>{" "}
                 runtime performance with real-time metric correlation and anomaly flagging.
@@ -184,23 +231,22 @@ export default function HomePage() {
         </div>
       </section>
 
-
       {/* =========================================
           SECTION 4: ENTERPRISE ROADMAP
       ========================================= */}
-      <section className="relative z-10 px-6 py-28">
-        <div className="w-full max-w-6xl mx-auto">
+      <section className="relative z-10 px-8 py-24 border-t border-slate-900">
+        <div className="w-full max-w-7xl mx-auto">
 
           {/* Section Header */}
           <div className="mb-16">
             <p className="text-xs font-mono tracking-[0.3em] text-slate-500 uppercase mb-3">PRODUCT ROADMAP</p>
-            <h2 className="font-orbitron text-4xl md:text-6xl font-bold tracking-tighter drop-shadow-[0_0_15px_rgba(0,240,255,0.25)] mb-4">
+            <h2 className="font-orbitron text-3xl md:text-5xl font-bold tracking-tighter drop-shadow-[0_0_15px_rgba(0,242,254,0.2)] mb-4">
               COMING SOON TO{" "}
-              <span className="text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.6)]">
+              <span className="text-[#00f2fe] drop-shadow-[0_0_20px_rgba(0,242,254,0.5)]">
                 PLATFORM ENGINE
               </span>
             </h2>
-            <p className="text-slate-400 text-base max-w-2xl border-l-2 border-[#00f0ff]/40 pl-4">
+            <p className="text-slate-400 text-sm max-w-2xl border-l-2 border-[#00f2fe]/40 pl-4 leading-relaxed">
               Next-generation capabilities currently in active development.
               Enterprise-grade features engineered for production-scale clusters.
             </p>
@@ -211,18 +257,18 @@ export default function HomePage() {
 
             {/* Card 1: AI Remediation */}
             <RoadmapCard
-              icon={<Bot size={28} />}
-              tag="JARVIS CORE ENGINE"
+              icon={<Bot size={24} />}
+              tag="CO-PILOT ENGINE"
               title="AI-Driven Incident Remediation"
               subtitle="Kuboptix Jarvis Core"
               description="Auto-pilot troubleshooting loops that detect pod crash loops, analyze logs via integrated LLMs, and safely apply automated manifest adjustments — all without human intervention."
-              accentColor="#00f0ff"
+              accentColor="#00f2fe"
               status="IN DEVELOPMENT"
             />
 
             {/* Card 2: DevSecOps */}
             <RoadmapCard
-              icon={<ShieldCheck size={28} />}
+              icon={<ShieldCheck size={24} />}
               tag="SECURITY MODULE"
               title="Advanced DevSecOps Security Guardrails"
               subtitle="Shift-Left Security Engine"
@@ -233,7 +279,7 @@ export default function HomePage() {
 
             {/* Card 3: Multi-Tenant */}
             <RoadmapCard
-              icon={<LayoutDashboard size={28} />}
+              icon={<LayoutDashboard size={24} />}
               tag="OBSERVABILITY LAYER"
               title="Multi-Tenant Observability Engine"
               subtitle="Unified Telemetry Platform"
@@ -246,35 +292,34 @@ export default function HomePage() {
         </div>
       </section>
 
-
       {/* =========================================
           SECTION 5: LEAD CAPTURE / WAITLIST
       ========================================= */}
-      <section id="waitlist" className="relative z-10 px-6 py-28">
+      <section id="waitlist" className="relative z-10 px-8 py-24 border-t border-slate-900 bg-[#040812]/30">
         {/* Glow backdrop */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-[#00f0ff]/5 blur-[80px]" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-[#00f2fe]/5 blur-[80px]" />
         </div>
 
         <div className="w-full max-w-4xl mx-auto relative">
           {/* Border panel — mirrors the login card geometry */}
-          <div className="relative rounded-xl border border-[#00f0ff]/25 bg-[#0a0f1c]/70 backdrop-blur-md p-12 shadow-[0_0_60px_-15px_rgba(0,240,255,0.2)]">
+          <div className="relative rounded-xl border border-[#00f2fe]/25 bg-[#070d1a]/85 backdrop-blur-md p-10 md:p-12 shadow-[0_0_60px_-15px_rgba(0,242,254,0.2)]">
             {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-5 h-5 border-l-2 border-t-2 border-[#00f0ff] rounded-tl-xl" />
-            <div className="absolute top-0 right-0 w-5 h-5 border-r-2 border-t-2 border-[#00f0ff] rounded-tr-xl" />
-            <div className="absolute bottom-0 left-0 w-5 h-5 border-l-2 border-b-2 border-[#00f0ff] rounded-bl-xl" />
-            <div className="absolute bottom-0 right-0 w-5 h-5 border-r-2 border-b-2 border-[#00f0ff] rounded-br-xl" />
+            <div className="absolute top-0 left-0 w-5 h-5 border-l-2 border-t-2 border-[#00f2fe] rounded-tl-xl" />
+            <div className="absolute top-0 right-0 w-5 h-5 border-r-2 border-t-2 border-[#00f2fe] rounded-tr-xl" />
+            <div className="absolute bottom-0 left-0 w-5 h-5 border-l-2 border-b-2 border-[#00f2fe] rounded-bl-xl" />
+            <div className="absolute bottom-0 right-0 w-5 h-5 border-r-2 border-b-2 border-[#00f2fe] rounded-tr-xl" />
 
             <div className="text-center mb-10">
               <p className="text-xs font-mono tracking-[0.3em] text-slate-500 uppercase mb-4">EARLY ACCESS PROGRAM</p>
-              <h2 className="font-orbitron text-3xl md:text-5xl font-bold tracking-tighter text-white drop-shadow-[0_0_20px_rgba(0,240,255,0.4)] mb-4">
-                Ready for Autonomous<br />
-                <span className="text-[#00f0ff] drop-shadow-[0_0_25px_rgba(0,240,255,0.7)]">
-                  Kubernetes Operations?
+              <h2 className="font-orbitron text-2xl md:text-4xl font-bold tracking-tighter text-white mb-4">
+                READY FOR AUTONOMOUS<br />
+                <span className="text-[#00f2fe] drop-shadow-[0_0_25px_rgba(0,242,254,0.6)]">
+                  KUBERNETES OPERATIONS?
                 </span>
               </h2>
-              <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
-                Join our exclusive pre-launch beta waitlist. Secure early developer access
+              <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+                Join our exclusive pre-launch beta waitlist. Secure early developer access 
                 and priority infrastructure credits.
               </p>
             </div>
@@ -282,17 +327,17 @@ export default function HomePage() {
             {submitted ? (
               <div className="flex flex-col items-center gap-3 py-6">
                 <div className="w-12 h-12 rounded-full border border-[#10b981] bg-[#10b981]/10 flex items-center justify-center text-[#10b981] shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  <CheckCircle size={22} />
                 </div>
-                <p className="font-orbitron text-[#10b981] tracking-widest text-sm drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
-                  ACCESS REQUEST RECEIVED
+                <p className="font-orbitron text-[#10b981] tracking-widest text-sm drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] uppercase font-bold">
+                  Access Request Received
                 </p>
                 <p className="text-slate-500 text-xs font-mono">We&apos;ll be in touch at {email}</p>
               </div>
             ) : (
               <form onSubmit={handleWaitlist} className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
                 <div className="relative flex-1">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#00f0ff]/60">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#00f2fe]/60">
                     <Mail size={16} />
                   </div>
                   <input
@@ -301,40 +346,38 @@ export default function HomePage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your corporate email..."
-                    className="w-full bg-[#050b14] border border-slate-700 rounded text-slate-300 pl-10 pr-4 py-3 focus:outline-none focus:border-[#00f0ff] focus:ring-1 focus:ring-[#00f0ff] focus:shadow-[0_0_12px_rgba(0,240,255,0.2)] transition-all font-mono text-sm placeholder-slate-600"
+                    className="w-full bg-[#030712] border border-slate-800 rounded text-slate-300 pl-10 pr-4 py-3 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] focus:shadow-[0_0_12px_rgba(0,242,254,0.2)] transition-all font-mono text-sm placeholder-slate-600"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 px-8 py-3 border border-[#00f0ff] bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 text-[#00f0ff] rounded font-orbitron text-xs tracking-widest transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] hover:shadow-[0_0_28px_rgba(0,240,255,0.5)] whitespace-nowrap"
+                  className="flex items-center justify-center gap-2 px-8 py-3 border border-[#00f2fe] bg-[#00f2fe]/10 hover:bg-[#00f2fe]/20 text-[#00f2fe] rounded font-orbitron text-xs font-bold tracking-widest transition-all shadow-[0_0_15px_rgba(0,242,254,0.2)] hover:shadow-[0_0_28px_rgba(0,242,254,0.45)] whitespace-nowrap uppercase"
                 >
-                  <Zap size={14} />
-                  JOIN BETA WAITLIST
+                  Join Beta Waitlist
                 </button>
               </form>
             )}
 
-            <p className="text-center text-slate-600 text-xs font-mono mt-6 tracking-wider">
+            <p className="text-center text-slate-600 text-[10px] font-mono mt-8 tracking-wider">
               No credit card required · Enterprise SLA available · SOC 2 Type II in progress
             </p>
           </div>
         </div>
       </section>
 
-
       {/* =========================================
           SECTION 6: FOOTER
       ========================================= */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-[#020617]/80 backdrop-blur-sm px-6 py-10">
-        <div className="max-w-6xl mx-auto">
+      <footer className="relative z-10 border-t border-slate-900 bg-[#020617]/90 backdrop-blur-sm px-8 py-12">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             {/* Logo mark */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 border border-[#00f0ff]/50 rounded flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.2)]">
-                <Terminal size={16} className="text-[#00f0ff]" />
+              <div className="w-8 h-8 border border-[#00f2fe]/50 rounded flex items-center justify-center shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+                <Terminal size={15} className="text-[#00f2fe]" />
               </div>
               <div>
-                <p className="font-orbitron text-sm font-bold text-[#00f0ff] tracking-widest drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">
+                <p className="font-orbitron text-sm font-bold text-[#00f2fe] tracking-widest drop-shadow-[0_0_8px_rgba(0,242,254,0.4)]">
                   KUBOPTIX
                 </p>
                 <p className="text-[9px] text-slate-600 font-mono tracking-[0.25em] uppercase">
@@ -345,22 +388,22 @@ export default function HomePage() {
 
             {/* Quick links */}
             <div className="flex items-center gap-6 text-xs font-mono text-slate-500 tracking-widest">
-              <Link href="/login" className="hover:text-[#00f0ff] transition-colors uppercase">Dashboard</Link>
-              <a href="#waitlist" className="hover:text-[#00f0ff] transition-colors uppercase">Early Access</a>
-              <a href="mailto:admin@kuboptix.com" className="hover:text-[#00f0ff] transition-colors uppercase">Support</a>
+              <Link href="/login" className="hover:text-[#00f2fe] transition-colors uppercase">Dashboard</Link>
+              <a href="#waitlist" className="hover:text-[#00f2fe] transition-colors uppercase">Early Access</a>
+              <a href="mailto:admin@kuboptix.com" className="hover:text-[#00f2fe] transition-colors uppercase">Support</a>
             </div>
 
             {/* Contact */}
             <div className="flex items-center gap-2 text-slate-500 text-xs font-mono">
-              <Mail size={12} className="text-[#00f0ff]/50" />
-              <a href="mailto:admin@kuboptix.com" className="hover:text-[#00f0ff] transition-colors">
+              <Mail size={12} className="text-[#00f2fe]/50" />
+              <a href="mailto:admin@kuboptix.com" className="hover:text-[#00f2fe] transition-colors">
                 admin@kuboptix.com
               </a>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="border-t border-slate-800/60 pt-6 flex flex-col md:flex-row items-center justify-between gap-2">
+          <div className="border-t border-slate-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-2">
             <p className="text-slate-600 text-xs font-mono tracking-wider">
               © 2026 Kuboptix Inc. All rights reserved.
             </p>
@@ -393,23 +436,23 @@ function ProviderCard({
 }) {
   return (
     <button
-      className="group relative h-64 rounded-xl bg-[#0a0f1c]/80 border border-slate-800 p-6 flex flex-col items-center justify-center gap-4 transition-all hover:-translate-y-2 overflow-hidden w-full backdrop-blur-sm"
+      className="group relative h-56 rounded-xl bg-[#070d1a]/60 border border-slate-800/80 p-6 flex flex-col items-center justify-center gap-4 transition-all duration-300 hover:-translate-y-1 overflow-hidden w-full backdrop-blur-sm hover:border-slate-700"
       style={
         { "--shadow-color": color } as React.CSSProperties
       }
     >
       <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
+        className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500"
         style={{ backgroundColor: color }}
       />
       {/* Top accent line */}
       <div
-        className="absolute top-0 left-0 w-full h-[2px] opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-0 left-0 w-full h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ backgroundColor: color }}
       />
-      <div style={{ color: color }}>{icon}</div>
-      <h3 className="font-orbitron text-xl font-bold text-white tracking-tighter">{title}</h3>
-      <p className="text-slate-500 text-xs tracking-widest uppercase font-mono">{desc}</p>
+      <div style={{ color: color }} className="transition-transform duration-300 group-hover:scale-110">{icon}</div>
+      <h3 className="font-orbitron text-lg font-bold text-white tracking-tighter">{title}</h3>
+      <p className="text-slate-500 text-[10px] tracking-widest uppercase font-mono">{desc}</p>
     </button>
   );
 }
@@ -433,7 +476,7 @@ function RoadmapCard({
 }) {
   return (
     <div
-      className="relative flex flex-col rounded-xl bg-[#0a0f1c]/80 border backdrop-blur-sm p-7 overflow-hidden transition-all hover:-translate-y-1 group"
+      className="relative flex flex-col rounded-xl bg-[#070d1a]/70 border backdrop-blur-sm p-6 overflow-hidden transition-all duration-300 hover:-translate-y-1 group"
       style={{ borderColor: `${accentColor}25` }}
     >
       {/* Top accent bar */}
@@ -448,18 +491,18 @@ function RoadmapCard({
       />
 
       {/* Tag */}
-      <p className="text-[9px] font-mono tracking-[0.3em] mb-4 uppercase" style={{ color: accentColor }}>
+      <p className="text-[9px] font-mono tracking-[0.25em] mb-4 uppercase" style={{ color: accentColor }}>
         {tag}
       </p>
 
       {/* Icon */}
       <div
-        className="w-12 h-12 rounded-lg border flex items-center justify-center mb-5 shadow-lg"
+        className="w-10 h-10 rounded-lg border flex items-center justify-center mb-4 shadow-lg"
         style={{
           borderColor: `${accentColor}40`,
           backgroundColor: `${accentColor}10`,
           color: accentColor,
-          boxShadow: `0 0 18px -4px ${accentColor}40`,
+          boxShadow: `0 0 15px -4px ${accentColor}30`,
         }}
       >
         {icon}
@@ -485,7 +528,7 @@ function RoadmapCard({
           style={{ backgroundColor: accentColor }}
         />
         <span
-          className="text-[9px] font-mono tracking-[0.25em] uppercase"
+          className="text-[9px] font-mono tracking-[0.2em] uppercase"
           style={{ color: accentColor }}
         >
           {status}
@@ -495,16 +538,60 @@ function RoadmapCard({
   );
 }
 
+function FeatureCard({
+  icon,
+  title,
+  description,
+  detailText,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  detailText?: string;
+}) {
+  return (
+    <div className="group relative rounded-xl border border-slate-800/60 bg-[#070d1a]/50 backdrop-blur-md p-8 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[#00f2fe]/40 hover:bg-[#070d1a]/85 shadow-[0_4px_25px_rgba(0,0,0,0.45)] flex flex-col justify-between min-h-[340px]">
+      <div>
+        {/* Glow border background */}
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#00f2fe]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        
+        {/* Icon Circle */}
+        <div className="w-12 h-12 rounded-lg border border-slate-800/80 bg-slate-900/60 flex items-center justify-center mb-6 shrink-0 group-hover:border-[#00f2fe]/30 group-hover:bg-[#00f2fe]/5 transition-all duration-300">
+          {icon}
+        </div>
+
+        {/* Content */}
+        <h3 className="font-orbitron text-lg font-bold text-white tracking-tight mb-3 group-hover:text-[#00f2fe] transition-colors duration-300 leading-snug">
+          {title}
+        </h3>
+        <p className="text-slate-400 text-sm leading-relaxed font-sans">
+          {description}
+        </p>
+      </div>
+
+      {detailText && (
+        <div className="mt-6 pt-4 border-t border-slate-800/40 text-xs font-mono text-slate-500 group-hover:text-[#00f2fe]/80 transition-colors flex items-center gap-1.5">
+          <span className="w-1 h-1 rounded-full bg-[#00f2fe]/60 group-hover:bg-[#00f2fe]" />
+          {detailText}
+        </div>
+      )}
+
+      {/* Decorative Corner Bracket */}
+      <div className="absolute bottom-0 right-0 w-3 h-3 border-r border-b border-slate-800/60 group-hover:border-[#00f2fe]/30 transition-colors" />
+    </div>
+  );
+}
+
 // ==========================================
 // DATA
 // ==========================================
 const integrationsData = [
-  { id: "apache", label: "APACHE", icon: <Feather size={28} /> },
-  { id: "java", label: "JAVA", icon: <Box size={28} /> },
-  { id: "mysql", label: "MYSQL", icon: <Database size={28} /> },
-  { id: "dotnet", label: ".NET", icon: <Layers size={28} /> },
-  { id: "nodejs", label: "NODE.JS", icon: <Code size={28} /> },
-  { id: "php", label: "PHP", icon: <Globe size={28} /> },
-  { id: "python", label: "PYTHON", icon: <Terminal size={28} /> },
-  { id: "ruby", label: "RUBY", icon: <Cpu size={28} /> },
+  { id: "apache",  label: "APACHE",  icon: <Wind size={24} />,     color: "#D22128" },
+  { id: "java",    label: "JAVA",    icon: <Coffee size={24} />,   color: "#f89820" },
+  { id: "mysql",   label: "MYSQL",   icon: <Database size={24} />, color: "#4479A1" },
+  { id: "dotnet",  label: ".NET",    icon: <Braces size={24} />,   color: "#7B4FBF" },
+  { id: "nodejs",  label: "NODE.JS", icon: <Code2 size={24} />,    color: "#339933" },
+  { id: "php",     label: "PHP",     icon: <FileCode size={24} />, color: "#777BB4" },
+  { id: "python",  label: "PYTHON",  icon: <Terminal size={24} />, color: "#3776AB" },
+  { id: "ruby",    label: "RUBY",    icon: <Gem size={24} />,      color: "#CC342D" },
 ];
