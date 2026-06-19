@@ -38,7 +38,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Use Cases",
     href: "/usecases",
   },
-  { label: "Pricing", href: "#waitlist" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Blog",    href: "#waitlist" },
   {
     label: "Resources",
