@@ -126,7 +126,7 @@ export default function InteractiveSphere() {
         const z2 = p.y * sinX + z1 * cosX;
 
         // Perspective projection
-        const sphereRadius = width * 0.28 * (1 + hoverProgress.current * 0.12);
+        const sphereRadius = width * 0.28 * (1 + hoverProgress.current * 0.35);
         const fov = 400;
         const scale = fov / (fov + z2 * sphereRadius * 0.5);
 
@@ -356,7 +356,7 @@ export default function InteractiveSphere() {
       }}
       onMouseMove={handleMouseMove}
       onClick={handleCanvasClick}
-      className="w-full max-w-[480px] lg:max-w-[550px] aspect-square flex items-center justify-center relative cursor-pointer overflow-hidden group select-none"
+      className="w-full max-w-[480px] lg:max-w-[550px] aspect-square flex items-center justify-center relative cursor-pointer overflow-hidden group select-none transition-transform duration-500 ease-out hover:scale-[1.15]"
     >
       <canvas ref={canvasRef} className="block" />
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,242,254,0.02)_0%,transparent_70%)]" />
