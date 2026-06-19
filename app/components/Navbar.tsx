@@ -48,17 +48,17 @@ const NAV_ITEMS: NavItem[] = [
         {
           title: "LEARN",
           links: [
-            { icon: <BookOpen size={18} />,  label: "Documentation", desc: "Guides, API refs & tutorials", href: "#waitlist" },
-            { icon: <FileText size={18} />,  label: "Changelog",     desc: "What's new in each release", href: "#waitlist" },
-            { icon: <GitBranch size={18} />, label: "Releases",      desc: "Version history & roadmap", href: "#waitlist" },
+            { icon: <BookOpen size={18} />,  label: "Documentation", desc: "Guides, API refs & tutorials", href: "/docs" },
+            { icon: <FileText size={18} />,  label: "Changelog",     desc: "What's new in each release", href: "/changelog" },
+            { icon: <GitBranch size={18} />, label: "Releases",      desc: "Version history & roadmap", href: "/releases" },
           ],
         },
         {
           title: "CONNECT",
           links: [
-            { icon: <LifeBuoy size={18} />,  label: "Support",   desc: "Contact the Kuboptix team", href: "mailto:admin@kuboptix.com" },
-            { icon: <Megaphone size={18} />, label: "Press",     desc: "Media kit & brand assets", href: "#waitlist" },
-            { icon: <Tag size={18} />,       label: "Community", desc: "Forum & GitHub discussions", href: "#waitlist" },
+            { icon: <LifeBuoy size={18} />,  label: "Support",   desc: "Contact the Kuboptix team", href: "/support" },
+            { icon: <Megaphone size={18} />, label: "Press",     desc: "Media kit & brand assets", href: "/press" },
+            { icon: <Tag size={18} />,       label: "Community", desc: "Forum & GitHub discussions", href: "/community" },
           ],
         },
       ],
