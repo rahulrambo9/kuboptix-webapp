@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Terminal, ChevronDown, BookOpen, FileText,
   Megaphone, Tag, GitBranch, LifeBuoy,
-  Zap, LogIn,
+  Zap, LogIn, Menu, X,
 } from "lucide-react";
 
 type DropdownLink = {
@@ -68,13 +68,16 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Navbar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node))
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setOpenMenu(null);
+        setMobileOpen(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -84,6 +87,16 @@ export default function Navbar() {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggle = (label: string) =>
@@ -164,15 +177,107 @@ export default function Navbar() {
           })}
         </ul>
 
-        {/* CTA */}
-        <Link
-          href="/login"
-          className="hidden sm:flex items-center gap-2 px-6 py-2.5 border-2 border-[#00f2fe]/60 bg-[#00f2fe]/10 hover:bg-[#00f2fe]/20 text-[#00f2fe] rounded-lg font-orbitron text-sm font-bold tracking-widest transition-all shadow-[0_0_14px_rgba(0,242,254,0.2)] hover:shadow-[0_0_24px_rgba(0,242,254,0.45)]"
-        >
-          <LogIn size={14} />
-          SIGN IN
-        </Link>
+        {/* Right Section: Sign In and Hamburger */}
+        <div className="flex items-center gap-4">
+          {/* CTA */}
+          <Link
+            href="/login"
+            className="hidden md:flex items-center gap-2 px-6 py-2.5 border-2 border-[#00f2fe]/60 bg-[#00f2fe]/10 hover:bg-[#00f2fe]/20 text-[#00f2fe] rounded-lg font-orbitron text-sm font-bold tracking-widest transition-all shadow-[0_0_14px_rgba(0,242,254,0.2)] hover:shadow-[0_0_24px_rgba(0,242,254,0.45)]"
+          >
+            <LogIn size={14} />
+            SIGN IN
+          </Link>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex md:hidden items-center justify-center p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all outline-none"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={20} className="text-[#00f2fe]" /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {mobileOpen && (
+        <div className="absolute top-[68px] left-0 right-0 bg-[#020617]/98 backdrop-blur-xl border-b border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.8)] md:hidden z-40 overflow-y-auto max-h-[calc(100vh-68px)] animate-[mobileFadeIn_0.2s_ease-out]">
+          <div className="p-6 space-y-6">
+            <ul className="space-y-2">
+              {NAV_ITEMS.map((item) => {
+                if (item.href) {
+                  return (
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="block px-4 py-3 text-base font-sans font-medium text-slate-350 hover:text-white rounded-xl hover:bg-white/5 transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={item.label} className="space-y-1">
+                    <div className="px-4 py-2 text-xs font-orbitron font-bold text-[#00f2fe]/80 tracking-widest uppercase">
+                      {item.label}
+                    </div>
+                    {item.dropdown && (
+                      <div className="pl-4 space-y-1">
+                        {item.dropdown.columns.map((col) => (
+                          <div key={col.title} className="space-y-1 pt-2">
+                            <div className="px-4 py-1 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                              {col.title}
+                            </div>
+                            <div className="space-y-0.5">
+                              {col.links.map((link) => (
+                                <Link
+                                  key={link.label}
+                                  href={link.href}
+                                  onClick={() => setMobileOpen(false)}
+                                  className="flex items-center gap-4 px-4 py-2.5 rounded-xl hover:bg-[#00f2fe]/8 text-slate-350 hover:text-white transition-all group text-left"
+                                >
+                                  <div className="w-8 h-8 rounded-lg border border-slate-800 bg-slate-900/60 flex items-center justify-center shrink-0 text-slate-400 group-hover:border-[#00f2fe]/50 group-hover:bg-[#00f2fe]/10 group-hover:text-[#00f2fe] transition-all">
+                                    {link.icon}
+                                  </div>
+                                  <div>
+                                    <span className="block text-sm font-semibold leading-none">{link.label}</span>
+                                    <span className="block text-[11px] text-slate-500 mt-1">{link.desc}</span>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/* Mobile Sign In button */}
+            <div className="pt-4 border-t border-slate-850">
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-6 py-3.5 border-2 border-[#00f2fe]/60 bg-[#00f2fe]/10 hover:bg-[#00f2fe]/20 text-[#00f2fe] rounded-xl font-orbitron text-sm font-bold tracking-widest transition-all shadow-[0_0_14px_rgba(0,242,254,0.15)] uppercase"
+              >
+                <LogIn size={15} />
+                SIGN IN
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes mobileFadeIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </nav>
   );
 }
