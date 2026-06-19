@@ -68,11 +68,11 @@ export default function HomePage() {
                 Book a Demo
               </a>
               <Link
-                href="/login"
+                href="/demo"
                 className="flex items-center justify-center gap-2 px-8 py-4 border-2 border-slate-700 hover:border-[#00f2fe] bg-transparent text-slate-300 hover:text-white rounded-lg font-orbitron text-xs tracking-[0.15em] transition-all hover:bg-[#00f2fe]/5 uppercase"
               >
-                <Zap size={13} className="text-[#00f2fe]" />
-                Launch Dashboard
+                <LayoutDashboard size={13} className="text-[#00f2fe]" />
+                View Sample Dashboard
               </Link>
             </div>
 
