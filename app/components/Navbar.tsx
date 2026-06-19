@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Terminal, ChevronDown, BookOpen, FileText,
   Megaphone, Tag, GitBranch, LifeBuoy,
-  Zap,
+  Zap, LogIn,
 } from "lucide-react";
 
 type DropdownLink = {
@@ -169,8 +169,8 @@ export default function Navbar() {
           href="/login"
           className="hidden sm:flex items-center gap-2 px-6 py-2.5 border-2 border-[#00f2fe]/60 bg-[#00f2fe]/10 hover:bg-[#00f2fe]/20 text-[#00f2fe] rounded-lg font-orbitron text-sm font-bold tracking-widest transition-all shadow-[0_0_14px_rgba(0,242,254,0.2)] hover:shadow-[0_0_24px_rgba(0,242,254,0.45)]"
         >
-          <Zap size={14} />
-          LAUNCH APP
+          <LogIn size={14} />
+          SIGN IN
         </Link>
       </div>
     </nav>
