@@ -39,7 +39,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/usecases",
   },
   { label: "Pricing", href: "/pricing" },
-  { label: "Blog",    href: "#waitlist" },
+  { label: "Blog",    href: "/blog" },
   {
     label: "Resources",
     dropdown: {
