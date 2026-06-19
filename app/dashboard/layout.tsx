@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Activity, Box, Layers, Server, Share2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 // Ensure these imports match your filenames exactly!
 import SystemStatus from "./components/SystemStatus"; 
@@ -12,6 +15,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <NamespaceProvider>
       <div className="flex min-h-screen bg-[#020617] font-sans text-white">
@@ -19,34 +24,45 @@ export default function DashboardLayout({
       {/* =======================
           SIDEBAR NAVIGATION
       ======================== */}
-      <aside className="w-64 border-r border-slate-800 flex flex-col fixed h-full z-20 bg-[#020617]">
+      <aside className="w-64 border-r border-slate-800 flex flex-col fixed h-full z-20 bg-[#020617] overflow-y-auto">
         
 
-        {/* LOGO (Now Clickable) */}
-        <Link href="/" className="block p-6 mb-6 hover:opacity-80 transition-opacity cursor-pointer">
-          <div className="flex items-center gap-2 text-[#00f0ff] mb-1">
-            <Activity className="w-6 h-6" />
-            <span className="font-orbitron font-bold text-lg tracking-wider">K8S JARVIS</span>
+        {/* LOGO (Clickable — returns to landing page) */}
+        <Link href="/" className="flex items-center gap-3 p-6 mb-6 hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 border-2 border-[#00f0ff]/70 rounded-lg flex items-center justify-center shadow-[0_0_10px_rgba(0,240,255,0.3)] shrink-0">
+            <Activity className="w-4 h-4 text-[#00f0ff]" />
           </div>
-          <div className="text-[10px] text-slate-500 tracking-[0.3em] pl-8">CLUSTER MONITOR</div>
+          <div>
+            <div className="font-orbitron font-bold text-base tracking-widest text-[#00f0ff] drop-shadow-[0_0_8px_rgba(0,240,255,0.5)]">
+              KUBOPTIX
+            </div>
+            <div className="text-[9px] text-slate-500 tracking-[0.25em] uppercase font-mono">
+              Cluster Monitor
+            </div>
+          </div>
         </Link>
 
         {/* NAVIGATION LINKS */}
         <nav className="flex-1 px-4 space-y-2">
           <Link href="/dashboard/overview" className="w-full block">
-             <NavItem icon={<Activity size={18} />} label="OVERVIEW" />
+             <NavItem icon={<Activity size={18} />} label="OVERVIEW" active={pathname === "/dashboard/overview"} />
           </Link>
   
           <Link href="/dashboard/pods" className="w-full block">
-            <NavItem icon={<Box size={18} />} label="PODS" />
+            <NavItem icon={<Box size={18} />} label="PODS" active={pathname === "/dashboard/pods"} />
           </Link>
 
          <Link href="/dashboard/deployments" className="w-full block">
-            <NavItem icon={<Layers size={18} />} label="DEPLOYMENTS" />
+            <NavItem icon={<Layers size={18} />} label="DEPLOYMENTS" active={pathname === "/dashboard/deployments"} />
          </Link>
          
-          <NavItem icon={<Share2 size={18} />} label="SERVICES" />
-          <NavItem icon={<Server size={18} />} label="NODES" />
+          <Link href="/dashboard/services" className="w-full block">
+             <NavItem icon={<Share2 size={18} />} label="SERVICES" active={pathname === "/dashboard/services"} />
+          </Link>
+
+          <Link href="/dashboard/nodes" className="w-full block">
+             <NavItem icon={<Server size={18} />} label="NODES" active={pathname === "/dashboard/nodes"} />
+          </Link>
         </nav>
 
         {/* SIDEBAR STATUS WIDGET */}

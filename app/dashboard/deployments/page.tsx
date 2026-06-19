@@ -24,7 +24,7 @@ export default function DeploymentsPage() {
     const fetchDeployments = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/deployments?namespace=${selectedNamespace}`);
-        if (!response.ok) throw new Error("Failed to reach Jarvis Backend");
+        if (!response.ok) throw new Error("Failed to reach Kuboptix Backend");
         
         const data = await response.json();
         setDeployments(data);

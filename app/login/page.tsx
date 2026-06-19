@@ -81,7 +81,7 @@ export default function LoginPage() {
               </p>
 
               {/* Body */}
-              <p className="text-slate-400 text-xs font-mono text-center leading-relaxed tracking-wide">
+              <p className="text-slate-300 text-sm font-sans text-center leading-relaxed tracking-wide">
                 You must register or contact us to use this product.
               </p>
 
@@ -126,17 +126,17 @@ export default function LoginPage() {
           <div className="absolute top-0 left-0  w-3 h-3 border-l-2 border-t-2 border-[#00f0ff]/60" />
           <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-[#00f0ff]/60" />
 
-          <h2 className="font-orbitron text-2xl text-[#00f0ff] mb-1 tracking-wide">
+          <h2 className="font-orbitron text-3xl text-[#00f0ff] mb-1 tracking-wide drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]">
             ACCESS TERMINAL
           </h2>
-          <p className="text-xs text-slate-400 mb-8 tracking-widest uppercase">
+          <p className="text-sm text-slate-400 mb-8 tracking-widest uppercase font-sans">
             Authenticate to continue
           </p>
 
           <form onSubmit={handleLogin} className="space-y-6">
             {/* EMAIL */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[#2d6f7c] tracking-widest uppercase">
+              <label className="text-sm font-semibold text-slate-300 tracking-widest uppercase font-sans">
                 Email Address
               </label>
               <div className="relative">
@@ -149,14 +149,14 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="user@kuboptix.com"
-                  className="w-full bg-[#050b14] border border-slate-800 rounded text-slate-300 px-10 py-3 focus:outline-none focus:border-[#00f0ff] focus:ring-1 focus:ring-[#00f0ff] transition-all font-mono"
+                  className="w-full bg-[#050b14] border border-slate-700 rounded-lg text-slate-200 text-[15px] px-10 py-3.5 focus:outline-none focus:border-[#00f0ff] focus:ring-1 focus:ring-[#00f0ff] transition-all font-sans placeholder-slate-600"
                 />
               </div>
             </div>
 
             {/* PASSWORD */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[#2d6f7c] tracking-widest uppercase">
+              <label className="text-sm font-semibold text-slate-300 tracking-widest uppercase font-sans">
                 Password
               </label>
               <div className="relative">
@@ -169,22 +169,22 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-[#050b14] border border-slate-800 rounded text-slate-300 px-10 py-3 focus:outline-none focus:border-[#00f0ff] focus:ring-1 focus:ring-[#00f0ff] transition-all font-mono"
+                  className="w-full bg-[#050b14] border border-slate-700 rounded-lg text-slate-200 text-[15px] px-10 py-3.5 focus:outline-none focus:border-[#00f0ff] focus:ring-1 focus:ring-[#00f0ff] transition-all font-sans placeholder-slate-600"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#0a1025] hover:bg-[#00f0ff]/10 text-white border border-[#2563eb] py-3 rounded font-orbitron font-bold tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]"
+              className="w-full bg-[#0a1025] hover:bg-[#00f0ff]/10 text-white border-2 border-[#00f0ff]/60 py-3.5 rounded-lg font-orbitron font-bold text-base tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(0,240,255,0.2)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]"
             >
               INITIATE LOGIN
             </button>
           </form>
 
-          <div className="mt-4 text-center">
-            <Link href="/" className="text-xs text-[#00f0ff] hover:underline tracking-widest">
-              ← RETURN TO MAIN MENU
+          <div className="mt-5 text-center">
+            <Link href="/" className="text-sm text-[#00f0ff] hover:underline tracking-widest font-sans">
+              ← Return to Main Menu
             </Link>
           </div>
         </div>

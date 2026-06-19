@@ -9,6 +9,9 @@ import {
   Zap, Mail,
 } from "lucide-react";
 
+import Navbar from "./components/Navbar";
+import InteractiveSphere from "./components/InteractiveSphere";
+
 export default function HomePage() {
   const [activeIntegration, setActiveIntegration] = useState("nodejs");
   const [email, setEmail] = useState("");
@@ -26,59 +29,65 @@ export default function HomePage() {
       <div className="absolute inset-0 h-full bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none z-0" />
 
 
+      {/* STICKY NAVBAR */}
+      <Navbar />
+
       {/* =========================================
           SECTION 1: HERO
       ========================================= */}
-      <section className="min-h-screen flex flex-col relative z-10">
-        <header className="absolute top-0 right-0 p-6">
-          <Link
-            href="/login"
-            className="group flex items-center gap-2 px-6 py-2 border border-[#00f0ff]/50 bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 text-[#00f0ff] rounded font-orbitron text-sm tracking-widest transition-all shadow-[0_0_10px_rgba(0,240,255,0.2)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]"
-          >
-            <Terminal size={16} />
-            <span>LOGIN / REGISTER</span>
-          </Link>
-        </header>
+      <section className="min-h-screen flex flex-col relative z-10 pt-20 max-w-7xl mx-auto px-8 justify-center">
 
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
+        {/* Centered Top Title & Badge */}
+        <div className="flex flex-col items-center text-center space-y-4 mb-8">
           {/* Badge */}
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/5 text-[#00f0ff] text-xs font-mono tracking-widest mb-8 shadow-[0_0_12px_rgba(0,240,255,0.15)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
+          <div className="flex items-center gap-2 px-5 py-2 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/5 text-[#00f0ff] text-sm font-sans font-medium tracking-widest shadow-[0_0_12px_rgba(0,240,255,0.15)]">
+            <span className="w-2 h-2 rounded-full bg-[#00f0ff] animate-pulse" />
             AUTONOMOUS KUBERNETES PLATFORM · v2.0 ENTERPRISE
           </div>
 
-          <h1 className="font-orbitron text-4xl md:text-7xl font-bold tracking-tighter text-white drop-shadow-[0_0_24px_rgba(0,240,255,0.55)] mb-2">
-            WELCOME TO
+          <h1 className="font-orbitron text-4xl md:text-6xl font-bold tracking-tight text-white drop-shadow-[0_0_24px_rgba(0,240,255,0.4)]">
+            WELCOME TO <span className="text-[#00f0ff] drop-shadow-[0_0_30px_rgba(0,240,255,0.65)]">KUBOPTIX</span>
           </h1>
-          <h1 className="font-orbitron text-5xl md:text-8xl font-bold tracking-tighter text-[#00f0ff] drop-shadow-[0_0_30px_rgba(0,240,255,0.75)] mb-8">
-            KUBOPTIX
-          </h1>
+        </div>
 
-          <p className="max-w-2xl text-slate-400 text-base md:text-lg leading-relaxed tracking-wide mb-10 border-l-2 border-[#00f0ff] pl-6 text-left bg-black/30 p-5 rounded-r-lg backdrop-blur-sm">
-            Advanced cluster visualization and autonomous management interface.
-            Monitor pod health, optimize resource allocation, and detect anomalies
-            in real-time across distributed containerized fleets.
-          </p>
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full py-6">
+          
+          {/* Left Description Column */}
+          <div className="lg:col-span-6 flex flex-col items-start text-left space-y-6">
+            <p className="text-slate-300 text-lg md:text-xl leading-relaxed border-l-2 border-[#00f0ff] pl-6 bg-black/30 p-5 rounded-r-lg backdrop-blur-sm font-sans">
+              Experience the core interaction concept of autonomous operations. 
+              Our interactive particle sphere responds dynamically to your hover state, representing self-healing node clusters, automated pod topology, and real-time telemetry scaling.
+            </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
-            <Link
-              href="/login"
-              className="flex items-center gap-2 px-8 py-3 border border-[#00f0ff] bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 text-[#00f0ff] rounded font-orbitron text-sm tracking-widest transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] hover:shadow-[0_0_28px_rgba(0,240,255,0.5)]"
-            >
-              <Zap size={16} />
-              LAUNCH DASHBOARD
-            </Link>
-            <a
-              href="#waitlist"
-              className="flex items-center gap-2 px-8 py-3 border border-slate-700 bg-slate-900/50 hover:border-slate-500 text-slate-300 hover:text-white rounded font-orbitron text-sm tracking-widest transition-all"
-            >
-              REQUEST EARLY ACCESS
-              <ChevronRight size={16} />
-            </a>
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <Link
+                href="/login"
+                className="flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-[#00f0ff] bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 text-[#00f0ff] rounded-lg font-orbitron text-sm tracking-widest transition-all shadow-[0_0_15px_rgba(0,240,255,0.25)] hover:shadow-[0_0_28px_rgba(0,240,255,0.5)] w-full sm:w-auto"
+              >
+                <Zap size={16} />
+                LAUNCH DASHBOARD
+              </Link>
+              <a
+                href="#waitlist"
+                className="flex items-center justify-center gap-2 px-8 py-3.5 border border-slate-600 bg-slate-900/50 hover:border-slate-400 text-slate-200 hover:text-white rounded-lg font-sans text-sm font-semibold tracking-wide transition-all w-full sm:w-auto"
+              >
+                Request Early Access
+                <ChevronRight size={16} />
+              </a>
+            </div>
           </div>
 
-          <div className="animate-bounce text-slate-500 text-xs tracking-widest font-mono">
-            SCROLL TO EXPLORE ↓
+          {/* Right Floating Sphere Column */}
+          <div className="lg:col-span-6 flex justify-center items-center">
+            <InteractiveSphere />
+          </div>
+          
+        </div>
+
+        <div className="flex justify-center pb-8">
+          <div className="animate-bounce text-slate-500 text-sm tracking-widest font-sans">
+            Scroll to explore ↓
           </div>
         </div>
       </section>

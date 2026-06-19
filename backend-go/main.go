@@ -477,6 +477,98 @@ func main() {
 		})
 	})
 
+	// 9. NODES LIST
+	mux.HandleFunc("GET /api/nodes", func(w http.ResponseWriter, r *http.Request) {
+		cs, _ := getClientset()
+		type NodeResponse struct {
+			Name    string `json:"name"`
+			Status  string `json:"status"`
+			Role    string `json:"role"`
+			Version string `json:"version"`
+			CPU     string `json:"cpu"`
+			Memory  string `json:"memory"`
+			Age     string `json:"age"`
+		}
+		nodesData := []NodeResponse{}
+		if cs != nil {
+			list, err := cs.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+			if err == nil {
+				for _, node := range list.Items {
+					status := "Ready"
+					for _, cond := range node.Status.Conditions {
+						if cond.Type == "Ready" && cond.Status != "True" {
+							status = "NotReady"
+						}
+					}
+					// Role extraction
+					role := "worker"
+					for label := range node.Labels {
+						if label == "node-role.kubernetes.io/control-plane" || label == "node-role.kubernetes.io/master" {
+							role = "control-plane"
+						}
+					}
+					nodesData = append(nodesData, NodeResponse{
+						Name:    node.Name,
+						Status:  status,
+						Role:    role,
+						Version: node.Status.NodeInfo.KubeletVersion,
+						CPU:     node.Status.Allocatable.Cpu().String(),
+						Memory:  node.Status.Allocatable.Memory().String(),
+						Age:     getAgeString(node.CreationTimestamp.Time),
+					})
+				}
+			} else {
+				log.Printf("[ERROR] Failed to fetch nodes: %v", err)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(nodesData)
+	})
+
+	// 10. SERVICES LIST
+	mux.HandleFunc("GET /api/services", func(w http.ResponseWriter, r *http.Request) {
+		cs, _ := getClientset()
+		type ServiceResponse struct {
+			Name      string `json:"name"`
+			Namespace string `json:"namespace"`
+			Type      string `json:"type"`
+			ClusterIP string `json:"clusterIP"`
+			ExternalIP string `json:"externalIP"`
+			Age       string `json:"age"`
+		}
+		servicesData := []ServiceResponse{}
+		if cs != nil {
+			ns := r.URL.Query().Get("namespace")
+			if ns == "all" {
+				ns = ""
+			}
+			list, err := cs.CoreV1().Services(ns).List(context.TODO(), metav1.ListOptions{})
+			if err == nil {
+				for _, svc := range list.Items {
+					extIP := "None"
+					if len(svc.Status.LoadBalancer.Ingress) > 0 {
+						extIP = svc.Status.LoadBalancer.Ingress[0].IP
+						if extIP == "" {
+							extIP = svc.Status.LoadBalancer.Ingress[0].Hostname
+						}
+					}
+					servicesData = append(servicesData, ServiceResponse{
+						Name:       svc.Name,
+						Namespace:  svc.Namespace,
+						Type:       string(svc.Spec.Type),
+						ClusterIP:  svc.Spec.ClusterIP,
+						ExternalIP: extIP,
+						Age:        getAgeString(svc.CreationTimestamp.Time),
+					})
+				}
+			} else {
+				log.Printf("[ERROR] Failed to fetch services: %v", err)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(servicesData)
+	})
+
 	log.Println("[INFO] Go Kubernetes Backend running on port 8000...")
 	if err := http.ListenAndServe(":8000", corsMiddleware(mux)); err != nil {
 		log.Fatalf("[FATAL] Server failed: %v", err)

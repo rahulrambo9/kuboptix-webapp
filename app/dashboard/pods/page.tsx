@@ -23,7 +23,7 @@ export default function PodsPage() {
     const fetchPods = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/pods?namespace=${selectedNamespace}`);
-        if (!response.ok) throw new Error("Failed to reach Jarvis Backend");
+        if (!response.ok) throw new Error("Failed to reach Kuboptix Backend");
         
         const data = await response.json();
         setPods(data);
@@ -55,14 +55,14 @@ export default function PodsPage() {
       </span>
     )}
         </h1>
-        <p className="text-xs text-slate-500 font-mono tracking-widest uppercase mt-1 ml-11">
+        <p className="text-sm text-slate-400 font-sans mt-1 ml-11">
           SYSTEM WORKLOADS & CONTAINERS
         </p>
       </div>
 
       {/* ERROR STATE */}
       {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-900/20 border border-red-500/50 rounded text-red-400 font-mono text-sm">
+        <div className="flex items-center gap-3 p-4 bg-red-900/20 border border-red-500/50 rounded text-red-400 font-sans text-sm">
           <AlertCircle size={18} />
           SYSTEM ERROR: {error} (Check CORS/Backend)
         </div>
@@ -102,19 +102,19 @@ function PodCard({ data }: { data: Pod }) {
 
        <div>
          <div className="flex justify-between items-start mb-2">
-            <h3 className="font-mono text-sm text-slate-200 truncate pr-4" title={data.name}>{data.name}</h3>
+            <h3 className="font-sans text-[15px] font-semibold text-slate-200 truncate pr-4" title={data.name}>{data.name}</h3>
             <div className={`w-2 h-2 rounded-full ${data.status === 'Running' ? 'animate-pulse' : ''}`} style={{ backgroundColor: color }} />
          </div>
-         <p className="text-xs font-bold mb-4" style={{ color: color }}>{data.status}</p>
+         <p className="text-sm font-sans font-semibold mb-4" style={{ color: color }}>{data.status}</p>
          
-         <div className="space-y-1">
-           <div className="flex justify-between text-[11px] font-mono text-slate-500">
-             <span>IP ADDRESS</span>
-             <span className="text-slate-300">{data.ip}</span>
+         <div className="space-y-1.5">
+           <div className="flex justify-between text-sm font-sans text-slate-500">
+             <span>IP Address</span>
+             <span className="text-slate-300 font-medium">{data.ip}</span>
            </div>
-           <div className="flex justify-between text-[11px] font-mono text-slate-500">
-             <span>NODE</span>
-             <span className="text-slate-300">{data.node}</span>
+           <div className="flex justify-between text-sm font-sans text-slate-500">
+             <span>Node</span>
+             <span className="text-slate-300 font-medium">{data.node}</span>
            </div>
          </div>
        </div>
