@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,9 +10,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -24,7 +28,305 @@ var (
 	activeConf  *rest.Config
 	clusterName = "Disconnected"
 	mu          sync.RWMutex
+
+	dbPool      *pgxpool.Pool
+	redisClient *redis.Client
 )
+
+// loadEnv reads a .env file and sets environment variables if not already set
+func loadEnv() {
+	paths := []string{".env", filepath.Join("..", ".env")}
+	for _, path := range paths {
+		if _, err := os.Stat(path); err == nil {
+			log.Printf("[INFO] Loading environment from: %s", path)
+			content, err := os.ReadFile(path)
+			if err != nil {
+				log.Printf("[WARN] Failed to read .env file: %v", err)
+				continue
+			}
+			lines := strings.Split(string(content), "\n")
+			for _, line := range lines {
+				line = strings.TrimSpace(line)
+				if line == "" || strings.HasPrefix(line, "#") {
+					continue
+				}
+				parts := strings.SplitN(line, "=", 2)
+				if len(parts) == 2 {
+					key := strings.TrimSpace(parts[0])
+					val := strings.TrimSpace(parts[1])
+					// Remove quotes if present
+					val = strings.Trim(val, "\"'`")
+					if os.Getenv(key) == "" {
+						os.Setenv(key, val)
+					}
+				}
+			}
+			break // Only load the first one found
+		}
+	}
+}
+
+// Helper to mask passwords in connection strings for secure logging
+func maskPassword(connStr string) string {
+	if strings.Contains(connStr, "@") && strings.Contains(connStr, "://") {
+		parts := strings.SplitN(connStr, "@", 2)
+		prefixParts := strings.SplitN(parts[0], ":", 3)
+		if len(prefixParts) == 3 {
+			return fmt.Sprintf("%s:%s:*****@%s", prefixParts[0], prefixParts[1], parts[1])
+		}
+	}
+	return connStr
+}
+
+// Initialize PostgreSQL Connection Pool
+func initDB() {
+	connStr := os.Getenv("DATABASE_URL")
+	if connStr == "" {
+		host := os.Getenv("DB_HOST")
+		port := os.Getenv("DB_PORT")
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
+		dbname := os.Getenv("DB_NAME")
+		sslmode := os.Getenv("DB_SSL")
+
+		if host != "" && user != "" && password != "" && dbname != "" {
+			if port == "" {
+				port = "5432"
+			}
+			if sslmode == "" {
+				sslmode = "disable"
+			}
+			connStr = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, dbname, sslmode)
+		} else {
+			connStr = "postgres://kuboptix:kuboptix_pass@localhost:5432/kuboptix?sslmode=disable"
+		}
+	}
+
+	log.Printf("[INFO] Connecting to PostgreSQL at: %s", maskPassword(connStr))
+	config, err := pgxpool.ParseConfig(connStr)
+	if err != nil {
+		log.Printf("[ERROR] Unable to parse database connection string: %v", err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	pool, err := pgxpool.NewWithConfig(ctx, config)
+	if err != nil {
+		log.Printf("[ERROR] Unable to connect to PostgreSQL: %v", err)
+		return
+	}
+
+	err = pool.Ping(ctx)
+	if err != nil {
+		log.Printf("[ERROR] PostgreSQL ping failed: %v", err)
+		pool.Close()
+		return
+	}
+
+	dbPool = pool
+	log.Println("[SUCCESS] Connected to PostgreSQL")
+
+	applySchema()
+}
+
+// Auto-run schema migrations on startup
+func applySchema() {
+	if dbPool == nil {
+		return
+	}
+
+	// Try relative or absolute path of schema.sql
+	schemaPath := "schema.sql"
+	if _, err := os.Stat(schemaPath); os.IsNotExist(err) {
+		// Fallback to parent path if we are running from a subfolder
+		schemaPath = filepath.Join("..", "backend-go", "schema.sql")
+	}
+
+	log.Printf("[INFO] Applying database schema from: %s", schemaPath)
+	schemaBytes, err := os.ReadFile(schemaPath)
+	if err != nil {
+		log.Printf("[ERROR] Failed to read schema file: %v", err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err = dbPool.Exec(ctx, string(schemaBytes))
+	if err != nil {
+		log.Printf("[ERROR] Failed to apply schema: %v", err)
+		return
+	}
+	log.Println("[SUCCESS] Database schema applied successfully")
+}
+
+// Initialize Redis Client
+func initRedis() {
+	addr := os.Getenv("REDIS_ADDR")
+	if addr == "" {
+		addr = "localhost:7379"
+	}
+
+	log.Printf("[INFO] Connecting to Redis at: %s", addr)
+	redisClient = redis.NewClient(&redis.Options{
+		Addr: addr,
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := redisClient.Ping(ctx).Result()
+	if err != nil {
+		log.Printf("[ERROR] Redis connection failed: %v", err)
+		redisClient = nil
+		return
+	}
+
+	log.Println("[SUCCESS] Connected to Redis")
+}
+
+// Helper function to handle Redis caching easily
+func getCachedData(ctx context.Context, key string, target interface{}, fetchFunc func() (interface{}, error), ttl time.Duration) error {
+	if redisClient == nil {
+		// Fallback to direct fetch if Redis is down
+		data, err := fetchFunc()
+		if err != nil {
+			return err
+		}
+		// Convert directly to target by marshaling and unmarshaling
+		bytes, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal(bytes, target)
+	}
+
+	// Check Redis Cache
+	val, err := redisClient.Get(ctx, key).Result()
+	if err == nil {
+		log.Printf("[CACHE HIT] Redis key: %s", key)
+		return json.Unmarshal([]byte(val), target)
+	}
+
+	log.Printf("[CACHE MISS] Redis key: %s. Fetching raw...", key)
+	data, err := fetchFunc()
+	if err != nil {
+		return err
+	}
+
+	serialized, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	// Save to Redis
+	redisClient.Set(ctx, key, serialized, ttl)
+	return json.Unmarshal(serialized, target)
+}
+
+// UserClaims holds authenticated user information
+type UserClaims struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+	Role   string `json:"role"`
+}
+
+type contextKey string
+const userContextKey contextKey = "user"
+
+// Auth Middleware for Clerk JWT validation (with local mock fallback)
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		devMode := os.Getenv("CLERK_DEV_MODE") != "false" // default to true for local testing
+
+		if authHeader == "" {
+			if devMode {
+				claims := UserClaims{
+					UserID: "user_mock123",
+					Email:  "dev@kuboptix.com",
+					Role:   "admin",
+				}
+				ctx := context.WithValue(r.Context(), userContextKey, claims)
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+			http.Error(w, "Unauthorized: Authorization header is required", http.StatusUnauthorized)
+			return
+		}
+
+		parts := strings.Split(authHeader, " ")
+		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+			http.Error(w, "Unauthorized: Invalid Authorization format. Expected Bearer <token>", http.StatusUnauthorized)
+			return
+		}
+
+		token := parts[1]
+
+		if devMode && (token == "mock-token" || os.Getenv("CLERK_PEM_PUBLIC_KEY") == "") {
+			claims := UserClaims{
+				UserID: "user_mock123",
+				Email:  "dev@kuboptix.com",
+				Role:   "admin",
+			}
+			ctx := context.WithValue(r.Context(), userContextKey, claims)
+			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
+		// Parse token claims
+		claims, err := parseAndValidateClerkToken(token)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Unauthorized: %v", err), http.StatusUnauthorized)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), userContextKey, claims)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// Extract base64 payload claims
+func parseAndValidateClerkToken(tokenStr string) (UserClaims, error) {
+	parts := strings.Split(tokenStr, ".")
+	if len(parts) != 3 {
+		return UserClaims{}, fmt.Errorf("invalid token format")
+	}
+
+	payloadSegment := parts[1]
+	if l := len(payloadSegment) % 4; l > 0 {
+		payloadSegment += strings.Repeat("=", 4-l)
+	}
+
+	decoded, err := base64.URLEncoding.DecodeString(payloadSegment)
+	if err != nil {
+		return UserClaims{}, fmt.Errorf("failed to decode token payload: %v", err)
+	}
+
+	var claims map[string]interface{}
+	if err := json.Unmarshal(decoded, &claims); err != nil {
+		return UserClaims{}, fmt.Errorf("failed to unmarshal token claims: %v", err)
+	}
+
+	userId, _ := claims["sub"].(string)
+	email, _ := claims["email"].(string)
+	role, _ := claims["role"].(string)
+
+	if userId == "" {
+		userId = "user_unknown"
+	}
+
+	return UserClaims{
+		UserID: userId,
+		Email:  email,
+		Role:   role,
+	}, nil
+}
+
+
+
 
 // Get active clientset and cluster name thread-safely
 func getClientset() (*kubernetes.Clientset, string) {
@@ -123,6 +425,13 @@ func autoLoadKubeconfig() {
 }
 
 func main() {
+	// Load environment variables if .env exists
+	loadEnv()
+
+	// Initialize PostgreSQL and Redis
+	initDB()
+	initRedis()
+
 	// Try loading default Kubeconfig immediately on startup
 	autoLoadKubeconfig()
 
@@ -131,24 +440,45 @@ func main() {
 	// 1. HEALTH ENDPOINT
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
 		cs, name := getClientset()
-		status := "offline"
+		k8sStatus := "offline"
 
 		if cs != nil {
 			// Test cluster connection by hitting Discovery API
 			_, err := cs.Discovery().ServerVersion()
 			if err == nil {
-				status = "online"
+				k8sStatus = "online"
 			} else {
 				log.Printf("[ERROR] Discovery API health check failed: %v", err)
-				status = "offline"
+				k8sStatus = "offline"
 				name = "Connection Refused"
 			}
 		}
 
+		dbStatus := "disconnected"
+		if dbPool != nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			if err := dbPool.Ping(ctx); err == nil {
+				dbStatus = "connected"
+			}
+			cancel()
+		}
+
+		redisStatus := "disconnected"
+		if redisClient != nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			if _, err := redisClient.Ping(ctx).Result(); err == nil {
+				redisStatus = "connected"
+			}
+			cancel()
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  status,
-			"cluster": name,
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":    k8sStatus,
+			"cluster":   name,
+			"postgres":  dbStatus,
+			"redis":     redisStatus,
+			"timestamp": time.Now().Format(time.RFC3339),
 		})
 	})
 
@@ -158,13 +488,20 @@ func main() {
 		namespaces := []string{"default"}
 
 		if cs != nil {
-			list, err := cs.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
-			if err == nil {
-				namespaces = []string{}
-				for _, ns := range list.Items {
-					namespaces = append(namespaces, ns.Name)
+			cacheKey := "k8s:namespaces"
+			fetchFunc := func() (interface{}, error) {
+				list, err := cs.CoreV1().Namespaces().List(r.Context(), metav1.ListOptions{})
+				if err != nil {
+					return nil, err
 				}
-			} else {
+				nsList := []string{}
+				for _, ns := range list.Items {
+					nsList = append(nsList, ns.Name)
+				}
+				return nsList, nil
+			}
+			err := getCachedData(r.Context(), cacheKey, &namespaces, fetchFunc, 5*time.Second)
+			if err != nil {
 				log.Printf("[ERROR] Failed to fetch namespaces: %v", err)
 			}
 		}
@@ -193,8 +530,13 @@ func main() {
 				ns = "" // empty string fetches all namespaces in client-go
 			}
 
-			list, err := cs.CoreV1().Pods(ns).List(context.TODO(), metav1.ListOptions{})
-			if err == nil {
+			cacheKey := fmt.Sprintf("k8s:pods:namespace:%s", ns)
+			fetchFunc := func() (interface{}, error) {
+				list, err := cs.CoreV1().Pods(ns).List(r.Context(), metav1.ListOptions{})
+				if err != nil {
+					return nil, err
+				}
+				data := []PodResponse{}
 				for _, pod := range list.Items {
 					restarts := 0
 					for _, status := range pod.Status.ContainerStatuses {
@@ -211,7 +553,7 @@ func main() {
 						ip = "Pending"
 					}
 
-					podsData = append(podsData, PodResponse{
+					data = append(data, PodResponse{
 						Name:      pod.Name,
 						Namespace: pod.Namespace,
 						Status:    string(pod.Status.Phase),
@@ -221,7 +563,11 @@ func main() {
 						Age:       getAgeString(pod.CreationTimestamp.Time),
 					})
 				}
-			} else {
+				return data, nil
+			}
+
+			err := getCachedData(r.Context(), cacheKey, &podsData, fetchFunc, 5*time.Second)
+			if err != nil {
 				log.Printf("[ERROR] Failed to fetch pods: %v", err)
 			}
 		}
@@ -251,11 +597,16 @@ func main() {
 				ns = ""
 			}
 
-			list, err := cs.AppsV1().Deployments(ns).List(context.TODO(), metav1.ListOptions{})
-			if err == nil {
+			cacheKey := fmt.Sprintf("k8s:deployments:namespace:%s", ns)
+			fetchFunc := func() (interface{}, error) {
+				list, err := cs.AppsV1().Deployments(ns).List(r.Context(), metav1.ListOptions{})
+				if err != nil {
+					return nil, err
+				}
+				data := []DeploymentResponse{}
 				for _, dep := range list.Items {
 					ready := dep.Status.ReadyReplicas
-					total := dep.Status.Replicas // or *dep.Spec.Replicas
+					total := dep.Status.Replicas
 					if dep.Spec.Replicas != nil {
 						total = *dep.Spec.Replicas
 					}
@@ -270,7 +621,7 @@ func main() {
 						strategy = string(dep.Spec.Strategy.Type)
 					}
 
-					deploymentsData = append(deploymentsData, DeploymentResponse{
+					data = append(data, DeploymentResponse{
 						Name:      dep.Name,
 						Ns:        dep.Namespace,
 						Namespace: dep.Namespace,
@@ -281,7 +632,11 @@ func main() {
 						Status:    status,
 					})
 				}
-			} else {
+				return data, nil
+			}
+
+			err := getCachedData(r.Context(), cacheKey, &deploymentsData, fetchFunc, 5*time.Second)
+			if err != nil {
 				log.Printf("[ERROR] Failed to fetch deployments: %v", err)
 			}
 		}
@@ -491,8 +846,13 @@ func main() {
 		}
 		nodesData := []NodeResponse{}
 		if cs != nil {
-			list, err := cs.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
-			if err == nil {
+			cacheKey := "k8s:nodes"
+			fetchFunc := func() (interface{}, error) {
+				list, err := cs.CoreV1().Nodes().List(r.Context(), metav1.ListOptions{})
+				if err != nil {
+					return nil, err
+				}
+				data := []NodeResponse{}
 				for _, node := range list.Items {
 					status := "Ready"
 					for _, cond := range node.Status.Conditions {
@@ -507,7 +867,7 @@ func main() {
 							role = "control-plane"
 						}
 					}
-					nodesData = append(nodesData, NodeResponse{
+					data = append(data, NodeResponse{
 						Name:    node.Name,
 						Status:  status,
 						Role:    role,
@@ -517,7 +877,11 @@ func main() {
 						Age:     getAgeString(node.CreationTimestamp.Time),
 					})
 				}
-			} else {
+				return data, nil
+			}
+
+			err := getCachedData(r.Context(), cacheKey, &nodesData, fetchFunc, 5*time.Second)
+			if err != nil {
 				log.Printf("[ERROR] Failed to fetch nodes: %v", err)
 			}
 		}
@@ -542,8 +906,14 @@ func main() {
 			if ns == "all" {
 				ns = ""
 			}
-			list, err := cs.CoreV1().Services(ns).List(context.TODO(), metav1.ListOptions{})
-			if err == nil {
+
+			cacheKey := fmt.Sprintf("k8s:services:namespace:%s", ns)
+			fetchFunc := func() (interface{}, error) {
+				list, err := cs.CoreV1().Services(ns).List(r.Context(), metav1.ListOptions{})
+				if err != nil {
+					return nil, err
+				}
+				data := []ServiceResponse{}
 				for _, svc := range list.Items {
 					extIP := "None"
 					if len(svc.Status.LoadBalancer.Ingress) > 0 {
@@ -552,7 +922,7 @@ func main() {
 							extIP = svc.Status.LoadBalancer.Ingress[0].Hostname
 						}
 					}
-					servicesData = append(servicesData, ServiceResponse{
+					data = append(data, ServiceResponse{
 						Name:       svc.Name,
 						Namespace:  svc.Namespace,
 						Type:       string(svc.Spec.Type),
@@ -561,7 +931,11 @@ func main() {
 						Age:        getAgeString(svc.CreationTimestamp.Time),
 					})
 				}
-			} else {
+				return data, nil
+			}
+
+			err := getCachedData(r.Context(), cacheKey, &servicesData, fetchFunc, 5*time.Second)
+			if err != nil {
 				log.Printf("[ERROR] Failed to fetch services: %v", err)
 			}
 		}
@@ -570,7 +944,8 @@ func main() {
 	})
 
 	log.Println("[INFO] Go Kubernetes Backend running on port 8000...")
-	if err := http.ListenAndServe(":8000", corsMiddleware(mux)); err != nil {
+	handler := corsMiddleware(authMiddleware(mux))
+	if err := http.ListenAndServe(":8000", handler); err != nil {
 		log.Fatalf("[FATAL] Server failed: %v", err)
 	}
 }

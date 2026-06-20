@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: kuboptix-redis
+    ports:
+      - "7379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: kuboptix-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-js"]
+    volumes:
+      - nats_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  nats_data:
+
